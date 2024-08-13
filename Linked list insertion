@@ -1,118 +1,82 @@
 #include <stdio.h>
 #include <stdlib.h>
-
 struct Node {
     int data;
     struct Node* next;
 };
-
-
-struct Node* createNode(int data) {
+void insertAtBeginning(struct Node** head, int value) {
     struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
-    newNode->data = data;
+    newNode->data = value;
+    newNode->next = *head;
+    *head = newNode;
+}
+void insertAtEnd(struct Node** head, int value) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    struct Node* temp = *head;
+    newNode->data = value;
     newNode->next = NULL;
-    return newNode;
-}
-
-
-void insertMiddle(struct Node** head_ref, int data) {
-    struct Node* newNode = createNode(data);
-    struct Node* slow = *head_ref;
-    struct Node* fast = *head_ref;
-
-   
-    if (*head_ref == NULL) {
-        *head_ref = newNode;
+    if (*head == NULL) {
+        *head = newNode;
         return;
     }
-
-   
-    while (fast != NULL && fast->next != NULL) {
-        slow = slow->next;
-        fast = fast->next->next;
+    while (temp->next != NULL) {
+        temp = temp->next;
     }
-
- 
-    newNode->next = slow->next;
-    slow->next = newNode;
+    temp->next = newNode;
 }
-
-
-void deleteMiddle(struct Node** head_ref) {
-    
-    if (*head_ref == NULL) {
+void insertAtPosition(struct Node** head, int value, int position) {
+    if (position <= 0) {
+        printf("Invalid position\n");
         return;
     }
-
-    struct Node* slow = *head_ref;
-    struct Node* fast = *head_ref;
-    struct Node* prev = NULL;
-
-    
-    if (slow->next == NULL) {
-        free(slow);
-        *head_ref = NULL;
+    if (position == 1 || *head == NULL) {
+        insertAtBeginning(head, value);
         return;
     }
-
-    
-    while (fast != NULL && fast->next != NULL) {
-        fast = fast->next->next;
-        prev = slow;
-        slow = slow->next;
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = value;
+    struct Node* temp = *head;
+    int count = 1;
+    while (count < position - 1 && temp->next != NULL) {
+        temp = temp->next;
+        count++;
     }
-
-    
-    if (prev != NULL) {
-        prev->next = slow->next;
-        free(slow);
+    if (count < position - 1) {
+        printf("Invalid position\n");
+        return;
     }
+    newNode->next = temp->next;
+    temp->next = newNode;
 }
-
-
-void printList(struct Node* node) {
-    while (node != NULL) {
-        printf("%d -> ", node->data);
-        node = node->next;
+void displayLinkedList(struct Node* head) {
+    struct Node* temp = head;
+    if (temp == NULL) {
+        printf("Linked list is empty.\n");
+        return;
+    }
+    while (temp != NULL) {
+        printf("%d -> ", temp->data);
+        temp = temp->next;
     }
     printf("NULL\n");
 }
-
-
-void freeList(struct Node* head) {
-    struct Node* temp;
-    while (head != NULL) {
-        temp = head;
-        head = head->next;
-        free(temp);
-    }
-}
-
-
 int main() {
     struct Node* head = NULL;
-
-    // Create a linked list 1->2->3->4->5
-    head = createNode(1);
-    head->next = createNode(2);
-    head->next->next = createNode(3);
-    head->next->next->next = createNode(4);
-    head->next->next->next->next = createNode(5);
-
-    printf("Original List: ");
-    printList(head);
-
-   
-    insertMiddle(&head, 10);
-    printf("After Inserting 10 in the Middle: ");
-    printList(head);
-
-    
-    deleteMiddle(&head);
-    printf("After Deleting Middle Node: ");
-    printList(head);
-
-   
-    freeList(head);
-    return 0;
+    // Insertion at the beginning
+    insertAtBeginning(&head, 10);
+    insertAtBeginning(&head, 20);
+    insertAtBeginning(&head, 30);
+    printf("Linked list after insertion at the beginning: ");
+    displayLinkedList(head);
+    // Insertion at the end
+    insertAtEnd(&head, 40);
+    insertAtEnd(&head, 50);
+    printf("Linked list after insertion at the end: ");
+    displayLinkedList(head);
+    // Insertion at a specific position
+    insertAtPosition(&head, 25, 2);
+    insertAtPosition(&head, 35, 4);
+    printf("Linked list after insertion at specific positions: ");
+    displayLinkedList(head);
+    return 0;
 }
